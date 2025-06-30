@@ -45,6 +45,19 @@ app.use("/api/v1/note", NoteRouter);
 app.use("/api/v1/carrier", CarrierRouter);
 app.use("/api/v1/userApply", UserApplyRouter);
 app.use("/api/v1/auth/login", LoginRouter);
+import fs from "fs";
+import path from "path";
+
+// Add this route temporarily for debugging
+app.get("/check-build", (req, res) => {
+  const buildPath = path.resolve(__dirname, "client/build");
+  fs.access(path.join(buildPath, "index.html"), fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).send("React build NOT found!");
+    }
+    res.send("React build FOUND!");
+  });
+});
 
 app.get("/*splat", (req, res) => {
   res.sendFile(path.resolve(__dirname, "client/build", "index.html"));
