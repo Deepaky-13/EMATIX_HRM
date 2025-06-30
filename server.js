@@ -11,6 +11,8 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import path from "path";
 
+app.use(express.static(path.resolve(__dirname, "client/build")));
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import DepartmentRouter from "./router/Department/DepartmentRouter.js";
