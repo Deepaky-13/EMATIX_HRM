@@ -11,12 +11,6 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import path from "path";
 
-app.use(
-  cors({
-    origin: "http://localhost:3000", // or whatever port your frontend runs on
-    credentials: true,
-  })
-);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import DepartmentRouter from "./router/Department/DepartmentRouter.js";
