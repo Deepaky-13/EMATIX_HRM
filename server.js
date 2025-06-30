@@ -13,10 +13,10 @@ import path from "path";
 import fs from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.use(express.static(path.resolve(__dirname, "client/build")));
+app.use(express.static(path.resolve(__dirname, "/public")));
 
 app.get("/check-build", (req, res) => {
-  const buildPath = path.resolve(__dirname, "client/build");
+  const buildPath = path.resolve(__dirname, "/public");
   fs.access(path.join(buildPath, "index.html"), fs.constants.F_OK, (err) => {
     if (err) {
       return res.status(404).send("React build NOT found!");
@@ -60,7 +60,7 @@ app.use("/api/v1/auth/login", LoginRouter);
 // Add this route temporarily for debugging
 
 app.get("/*splat", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client/build", "index.html"));
+  res.sendFile(path.resolve(__dirname, "./public", "index.html"));
 });
 
 try {
