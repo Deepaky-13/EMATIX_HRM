@@ -10,10 +10,9 @@ import cors from "cors";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import path from "path";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(path.resolve(__dirname, "client/build")));
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import DepartmentRouter from "./router/Department/DepartmentRouter.js";
 import RoleRouter from "./router/Roles/RoleRoutes.js";
@@ -48,7 +47,7 @@ app.use("/api/v1/userApply", UserApplyRouter);
 app.use("/api/v1/auth/login", LoginRouter);
 
 app.get("/*splat", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./public", "index.html"));
+  res.sendFile(path.resolve(__dirname, "client/build", "index.html"));
 });
 
 try {
