@@ -13,10 +13,11 @@ import path from "path";
 import fs from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.use(express.static(path.resolve(__dirname, "/public")));
+app.use(express.static(path.resolve(__dirname, "client/dist")));
+// app.use(express.static(path.resolve(__dirname, "client/dist")));
 
 app.get("/check-build", (req, res) => {
-  const buildPath = path.resolve(__dirname, "/public");
+  const buildPath = path.resolve(__dirname, "client/dist");
   fs.access(path.join(buildPath, "index.html"), fs.constants.F_OK, (err) => {
     if (err) {
       return res.status(404).send("React build NOT found!");
@@ -38,7 +39,6 @@ import CarrierRouter from "./router/Carrier/CarrierRouter.js";
 import UserApplyRouter from "./router/Carrier/UserApplicationRouter.js";
 import LoginRouter from "./router/Authentication/AuthRouter.js";
 
-app.use(express.static(path.resolve(__dirname, "./public")));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -60,7 +60,7 @@ app.use("/api/v1/auth/login", LoginRouter);
 // Add this route temporarily for debugging
 
 app.get("/*splat", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./public", "index.html"));
+  res.sendFile(path.resolve(__dirname, "client/dist", "index.html"));
 });
 
 try {
