@@ -59,7 +59,8 @@ app.use("/api/v1/auth/login", LoginRouter);
 
 // Add this route temporarily for debugging
 
-app.get("/*splat", (req, res) => {
+// Catch-all GET route for SPA routing
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, "client/dist", "index.html"));
 });
 
