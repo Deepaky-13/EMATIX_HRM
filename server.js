@@ -26,7 +26,7 @@ import CarrierRouter from "./router/Carrier/CarrierRouter.js";
 import UserApplyRouter from "./router/Carrier/UserApplicationRouter.js";
 import LoginRouter from "./router/Authentication/AuthRouter.js";
 
-app.use(express.static(path.resolve(__dirname, "client/dist")));
+app.use(express.static(path.resolve(__dirname, "Client/dist")));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -49,7 +49,7 @@ app.use("/api/v1/auth/login", LoginRouter);
 
 // Catch-all GET route for SPA routing
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client/dist", "index.html"));
+  res.sendFile(path.resolve(__dirname, "Client/dist", "index.html"));
 });
 
 try {
