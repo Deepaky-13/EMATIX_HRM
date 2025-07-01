@@ -13,19 +13,6 @@ import path from "path";
 import fs from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.use(express.static(path.resolve(__dirname, "client/dist")));
-// app.use(express.static(path.resolve(__dirname, "client/dist")));
-
-app.get("/check-build", (req, res) => {
-  const buildPath = path.resolve(__dirname, "client/dist");
-  fs.access(path.join(buildPath, "index.html"), fs.constants.F_OK, (err) => {
-    if (err) {
-      return res.status(404).send("React build NOT found!");
-    }
-    res.send("React build FOUND!");
-  });
-});
-
 import DepartmentRouter from "./router/Department/DepartmentRouter.js";
 import RoleRouter from "./router/Roles/RoleRoutes.js";
 import ProjectAssignRouter from "./router/ProjectsAssign/ProjectRouter.js";
@@ -39,6 +26,7 @@ import CarrierRouter from "./router/Carrier/CarrierRouter.js";
 import UserApplyRouter from "./router/Carrier/UserApplicationRouter.js";
 import LoginRouter from "./router/Authentication/AuthRouter.js";
 
+app.use(express.static(path.resolve(__dirname, "./public")));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -61,7 +49,7 @@ app.use("/api/v1/auth/login", LoginRouter);
 
 // Catch-all GET route for SPA routing
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client/dist", "index.html"));
+  res.sendFile(path.resolve(__dirname, "./public", "index.html"));
 });
 
 try {
