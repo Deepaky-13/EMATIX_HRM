@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaToggleOn, FaToggleOff } from "react-icons/fa";
-import customFetch from "../../utils/customFetch";
 import { toast } from "react-toastify";
+import customFetch from "../../utils/customFetch";
 import ConformationModal from "../common/ConformationModal";
 import { HiOutlinePower, HiPower } from "react-icons/hi2";
 
@@ -26,6 +25,19 @@ const CheckInOutToggle = () => {
     }
   };
 
+  const parseCheckInTimeToLocalDate = (checkInTime) => {
+    const today = new Date();
+    const [hours, minutes] = checkInTime.split(":").map(Number);
+    return new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      hours,
+      minutes,
+      0
+    );
+  };
+
   const toggleStatus = async () => {
     try {
       const res = await customFetch.post(
@@ -37,8 +49,8 @@ const CheckInOutToggle = () => {
 
       if (attendance.status === "Active") {
         setIsCheckedIn(true);
-        const today = new Date().toISOString().split("T")[0];
-        setStartTime(`${today}T${attendance.checkInTime}:00`);
+        const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
+        setStartTime(start.toISOString());
       } else {
         setIsCheckedIn(false);
         setStartTime(null);
@@ -60,8 +72,8 @@ const CheckInOutToggle = () => {
 
       if (attendance?.status === "Active") {
         setIsCheckedIn(true);
-        const today = new Date().toISOString().split("T")[0];
-        setStartTime(`${today}T${attendance.checkInTime}:00`);
+        const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
+        setStartTime(start.toISOString());
       }
     } catch (err) {
       console.error("Could not fetch attendance", err);
@@ -103,13 +115,6 @@ const CheckInOutToggle = () => {
       </div>
 
       <div className="flex justify-between">
-        {/* <p className="mt-2 text-sm text-gray-300">
-          Status:{" "}
-          <span className={isCheckedIn ? "text-green-400" : "text-red-400"}>
-            {isCheckedIn ? "online" : "Offline"}
-          </span>
-        </p> */}
-
         {isCheckedIn && (
           <p className="mt-1 text-lg font-bold text-white font-mono">
             {formatTime(elapsedTime)}
@@ -117,7 +122,6 @@ const CheckInOutToggle = () => {
         )}
       </div>
 
-      {/* Confirm Modal */}
       <ConformationModal
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
@@ -129,12 +133,3 @@ const CheckInOutToggle = () => {
 };
 
 export default CheckInOutToggle;
-{
-  /* <button onClick={handleToggle} className="text-3xl">
-          {isCheckedIn ? (
-            <FaToggleOn className="text-green-500 hover:text-green-400" />
-          ) : (
-            <FaToggleOff className="text-red-500 hover:text-red-400" />
-          )}
-        </button> */
-}
