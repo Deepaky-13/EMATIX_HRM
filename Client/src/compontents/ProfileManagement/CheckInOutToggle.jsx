@@ -6,7 +6,7 @@ import { HiOutlinePower, HiPower } from "react-icons/hi2";
 
 const CheckInOutToggle = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState(null); // store as milliseconds
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -50,7 +50,7 @@ const CheckInOutToggle = () => {
       if (attendance.status === "Active") {
         setIsCheckedIn(true);
         const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
-        setStartTime(start.toISOString());
+        setStartTime(start.getTime()); // store as milliseconds since epoch
       } else {
         setIsCheckedIn(false);
         setStartTime(null);
@@ -73,7 +73,7 @@ const CheckInOutToggle = () => {
       if (attendance?.status === "Active") {
         setIsCheckedIn(true);
         const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
-        setStartTime(start.toISOString());
+        setStartTime(start.getTime());
       }
     } catch (err) {
       console.error("Could not fetch attendance", err);
@@ -88,7 +88,7 @@ const CheckInOutToggle = () => {
     let interval;
     if (isCheckedIn && startTime) {
       interval = setInterval(() => {
-        const diff = Math.floor((Date.now() - new Date(startTime)) / 1000);
+        const diff = Math.floor((Date.now() - startTime) / 1000);
         setElapsedTime(diff);
       }, 1000);
     }
