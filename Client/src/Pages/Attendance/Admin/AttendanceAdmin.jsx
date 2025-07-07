@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import customFetch from "../../../utils/customFetch";
+import moment from "moment-timezone"; // ✅ Add moment-timezone
 
 const months = [
   "Jan",
@@ -82,6 +83,12 @@ const AttendanceAdmin = () => {
     });
   };
 
+  const formatTimeIST = (isoTime) => {
+    return isoTime
+      ? moment(isoTime).tz("Asia/Kolkata").format("HH:mm:ss")
+      : "—";
+  };
+
   return (
     <div className="p-2 overflow-x-auto">
       {/* Month Tabs */}
@@ -136,9 +143,11 @@ const AttendanceAdmin = () => {
                   const ws = record?.workStatus;
                   const shortStatus = workStatusMap[ws] || "";
                   const tooltip = record
-                    ? `Status: ${ws}, In: ${record.checkInTime || "—"}, Out: ${
-                        record.checkOutTime || "—"
-                      }, Duration: ${record.totalDuration || "—"}`
+                    ? `Status: ${ws}, In: ${formatTimeIST(
+                        record.checkInTime
+                      )}, Out: ${formatTimeIST(
+                        record.checkOutTime
+                      )}, Duration: ${record.totalDuration || "—"}`
                     : "No record";
 
                   return (
