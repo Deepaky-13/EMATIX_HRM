@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import customFetch from "../../utils/customFetch";
 import ConformationModal from "../common/ConformationModal";
 import { HiOutlinePower, HiPower } from "react-icons/hi2";
+import moment from "moment-timezone"; // ✅ add this line
 
 const CheckInOutToggle = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -25,17 +26,14 @@ const CheckInOutToggle = () => {
     }
   };
 
+  // ✅ REPLACE parseCheckInTimeToLocalDate with IST-aware version
   const parseCheckInTimeToLocalDate = (checkInTime) => {
-    const today = new Date();
-    const [hours, minutes] = checkInTime.split(":").map(Number);
-    return new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-      hours,
-      minutes,
-      0
+    const todayIST = moment.tz(
+      `${moment().format("YYYY-MM-DD")} ${checkInTime}`,
+      "YYYY-MM-DD HH:mm",
+      "Asia/Kolkata"
     );
+    return todayIST.toDate();
   };
 
   const toggleStatus = async () => {
