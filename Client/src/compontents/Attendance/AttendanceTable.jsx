@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import moment from "moment-timezone";
 import customFetch from "../../utils/customFetch";
 
 const workStatusMap = {
@@ -30,6 +31,11 @@ const formatDuration = (mins) => {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   return `${h}h ${m}m`;
+};
+
+const formatIST = (dateStr) => {
+  if (!dateStr) return "—";
+  return moment(dateStr).tz("Asia/Kolkata").format("HH:mm:ss");
 };
 
 const AttendanceTable = ({ userInfo }) => {
@@ -131,11 +137,11 @@ const AttendanceTable = ({ userInfo }) => {
                 });
 
                 const tooltip = record
-                  ? `Status: ${record.workStatus || "In progress"}, In: ${
-                      record.checkInTime || "—"
-                    }, Out: ${record.checkOutTime || "—"}, Duration: ${
-                      record.totalDuration || "—"
-                    }`
+                  ? `Status: ${
+                      record.workStatus || "In progress"
+                    }, In: ${formatIST(record.checkInTime)}, Out: ${formatIST(
+                      record.checkOutTime
+                    )}, Duration: ${record.totalDuration || "—"}`
                   : "No record";
 
                 return (
