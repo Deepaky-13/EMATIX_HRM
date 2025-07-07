@@ -6,7 +6,7 @@ import { HiOutlinePower, HiPower } from "react-icons/hi2";
 
 const CheckInOutToggle = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [startTime, setStartTime] = useState(null); // Date object in milliseconds
+  const [startTime, setStartTime] = useState(null); // timestamp in ms
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -36,36 +36,47 @@ const CheckInOutToggle = () => {
 
       if (attendance.status === "Active") {
         setIsCheckedIn(true);
+        // ✅ set start time using stored Date from server
         setStartTime(new Date(attendance.checkInTime).getTime());
+        toast.success("Checked in successfully!");
       } else {
         setIsCheckedIn(false);
         setStartTime(null);
         setElapsedTime(0);
+        toast.success("Checked out successfully!");
       }
+      setShowConfirm(false);
     } catch (err) {
+      console.error("❌ Toggle error", err);
       toast.error(
-        "You can check out only once per day. Only one login exists per day."
+        err?.response?.data?.msg ||
+          "Error: You can check out only once per day."
       );
-    }
-  };
-
-  const fetchTodayAttendance = async () => {
-    try {
-      const res = await customFetch.get("/attendance/today", {
-        withCredentials: true,
-      });
-      const attendance = res.data.attendance;
-
-      if (attendance?.status === "Active" && attendance?.checkInTime) {
-        setIsCheckedIn(true);
-        setStartTime(new Date(attendance.checkInTime).getTime());
-      }
-    } catch (err) {
-      console.error("❌ Could not fetch attendance", err);
+      setShowConfirm(false);
     }
   };
 
   useEffect(() => {
+    const fetchTodayAttendance = async () => {
+      try {
+        const res = await customFetch.get("/attendance/today", {
+          withCredentials: true,
+        });
+        const attendance = res.data.attendance;
+
+        if (attendance?.status === "Active" && attendance?.checkInTime) {
+          setIsCheckedIn(true);
+          setStartTime(new Date(attendance.checkInTime).getTime());
+        } else {
+          setIsCheckedIn(false);
+          setStartTime(null);
+          setElapsedTime(0);
+        }
+      } catch (err) {
+        console.error("❌ Could not fetch attendance", err);
+      }
+    };
+
     fetchTodayAttendance();
   }, []);
 

@@ -7,17 +7,15 @@ const AttendanceSchema = new mongoose.Schema(
       ref: "Role",
       required: true,
     },
-    date: {
-      type: String,
-      required: true,
-    },
+    date: { type: String, required: true }, // e.g., "2025-07-07"
+    checkInTime: { type: Date }, // store ISO Date, not HH:mm string!
+    checkOutTime: { type: Date }, // same here
     status: {
       type: String,
       enum: ["Active", "Offline"],
       default: "Offline",
     },
-    checkInTime: String,
-    checkOutTime: String,
+
     totalDuration: String,
 
     workStatus: {

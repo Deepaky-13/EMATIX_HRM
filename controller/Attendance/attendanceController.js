@@ -1,18 +1,10 @@
 import mongoose from "mongoose";
 import Attendance from "../../model/Attendance/AttendanceSchema.js";
-import moment from "moment";
+import moment from "moment-timezone";
 
-// Helper to format duration from HH:mm to "xh ym"
-const formatDuration = (start, end) => {
-  const duration = moment.duration(
-    moment(end, "HH:mm").diff(moment(start, "HH:mm"))
-  );
-  const hours = duration.hours();
-  const minutes = duration.minutes();
-  return `${hours}h ${minutes}m`;
-};
+console.log("Date now:", new Date());
+console.log("Moment Asia/Kolkata:", moment().tz("Asia/Kolkata").format());
 
-//  to parse "8h 15m" => minutes
 const durationToMinutes = (durationStr = "0h 0m") => {
   const [h = "0", m = "0"] = durationStr.split(" ");
   const hours = parseInt(h) || 0;
@@ -20,12 +12,20 @@ const durationToMinutes = (durationStr = "0h 0m") => {
   return hours * 60 + minutes;
 };
 
-// Helper to classify work status based on total minutes
+// ⏱️ Format duration between two Date objects → "xh ym"
+const formatDuration = (start, end) => {
+  const duration = moment.duration(moment(end).diff(moment(start)));
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  return `${hours}h ${minutes}m`;
+};
+
+// 📊 Classify work status based on total minutes
 const classifyWorkStatus = (durationStr) => {
   const [h, m] = durationStr.split(" ").map((t) => parseInt(t));
   const totalMinutes = (h || 0) * 60 + (m || 0);
 
-  if (totalMinutes === 510) return "Full Day Present";
+  if (totalMinutes >= 480 && totalMinutes <= 510) return "Full Day Present";
   if (totalMinutes > 510) return "Overtime";
   if (totalMinutes >= 420 && totalMinutes < 480) return "Warning"; // 7h–7h59m
   if (totalMinutes > 300 && totalMinutes < 420) return "Half Day Present"; // 5h–6h59m
@@ -33,22 +33,25 @@ const classifyWorkStatus = (durationStr) => {
   return "Absent";
 };
 
-// POST /api/attendance/toggle
 export const toggleAttendance = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const today = moment().format("YYYY-MM-DD");
+    const todayIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
-    let attendance = await Attendance.findOne({ userId, date: today });
+    let attendance = await Attendance.findOne({ userId, date: todayIST });
 
     if (!attendance) {
-      // First-time check-in
+      // ✅ First-time check-in → save as Date
+      const checkInTime = moment().tz("Asia/Kolkata").toDate();
+      console.log(
+        `✅ Creating new check-in at ${checkInTime} for user ${userId}`
+      );
+
       const newAttendance = await Attendance.create({
         userId,
-        date: today,
-        checkInTime: moment().format("HH:mm"),
+        date: todayIST,
+        checkInTime,
         status: "Active",
-        // workStatus: " ",
       });
 
       return res.status(200).json({
@@ -58,8 +61,10 @@ export const toggleAttendance = async (req, res) => {
     }
 
     if (attendance.status === "Active") {
-      // Check-out
-      const checkOutTime = moment().format("HH:mm");
+      // ✅ Check-out → also save as Date
+      const checkOutTime = moment().tz("Asia/Kolkata").toDate();
+      console.log(`✅ Checking out at ${checkOutTime} for user ${userId}`);
+
       const duration = formatDuration(attendance.checkInTime, checkOutTime);
       const workStatus = classifyWorkStatus(duration);
 
@@ -76,19 +81,19 @@ export const toggleAttendance = async (req, res) => {
       });
     }
 
-    return res.status(400).json({ msg: "Already checked out." });
+    return res.status(400).json({ msg: "Already checked out today." });
   } catch (error) {
+    console.error("❌ Error in toggleAttendance:", error.message);
     return res.status(500).json({ msg: "Server error", error: error.message });
   }
 };
 
-// GET /api/attendance/today
 export const getTodayAttendance = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const today = moment().format("YYYY-MM-DD");
+    const todayIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
-    const attendance = await Attendance.findOne({ userId, date: today });
+    const attendance = await Attendance.findOne({ userId, date: todayIST });
 
     res.status(200).json({ attendance });
   } catch (error) {
@@ -96,12 +101,10 @@ export const getTodayAttendance = async (req, res) => {
   }
 };
 
-// GET /api/attendance (ADMIN: fetch all)
 export const getAllAttendance = async (req, res) => {
   try {
     const { date, userId } = req.query;
     const query = {};
-
     if (date) query.date = date;
     if (userId) query.userId = userId;
 
@@ -115,7 +118,6 @@ export const getAllAttendance = async (req, res) => {
   }
 };
 
-// GET /api/attendance/admin
 export const getAllAttendanceForAdmin = async (req, res) => {
   try {
     const records = await Attendance.find({})
@@ -134,7 +136,6 @@ export const getAllAttendanceForAdmin = async (req, res) => {
           presentDays: 0,
         };
       }
-      // Count present days only if the work status is positive
       if (
         ["Full Day Present", "Half Day Present", "Overtime"].includes(
           record.workStatus
@@ -142,7 +143,6 @@ export const getAllAttendanceForAdmin = async (req, res) => {
       ) {
         summaryMap[userId].presentDays += 1;
       }
-      // Accumulate duration
       summaryMap[userId].totalMinutes += durationToMinutes(
         record.totalDuration
       );
@@ -160,7 +160,6 @@ export const getAllAttendanceForAdmin = async (req, res) => {
   }
 };
 
-// GET /api/attendance/user (for logged-in user)
 export const getAllAttendanceForLoggedInUser = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.userId);
@@ -168,21 +167,16 @@ export const getAllAttendanceForLoggedInUser = async (req, res) => {
       date: 1,
     });
     await recalculateAllAttendances();
-    console.log("attendacme ", attendanceRecords);
     res.status(200).json({ attendanceRecords });
   } catch (error) {
     res.status(500).json({ msg: "Server error", error: error.message });
   }
 };
-// PATCH /api/attendance/recalculate/:id
-// In the same attendance controller file:
 
 export const recalculateAllAttendances = async () => {
   try {
     const records = await Attendance.find({});
-
     let updatedCount = 0;
-
     for (const record of records) {
       if (record.checkInTime && record.checkOutTime) {
         const duration = formatDuration(
@@ -190,19 +184,16 @@ export const recalculateAllAttendances = async () => {
           record.checkOutTime
         );
         const workStatus = classifyWorkStatus(duration);
-
         record.totalDuration = duration;
         record.workStatus = workStatus;
-
         await record.save();
         updatedCount++;
       }
     }
-
     console.log(
       `Recalculated ${updatedCount} attendance records successfully.`
     );
   } catch (error) {
-    console.error(" Error in bulk recalculation:", error.message);
+    console.error("❌ Error in bulk recalculation:", error.message);
   }
 };
