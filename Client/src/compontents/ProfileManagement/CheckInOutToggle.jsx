@@ -3,11 +3,10 @@ import { toast } from "react-toastify";
 import customFetch from "../../utils/customFetch";
 import ConformationModal from "../common/ConformationModal";
 import { HiOutlinePower, HiPower } from "react-icons/hi2";
-import moment from "moment-timezone"; // ✅ add this line
 
 const CheckInOutToggle = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [startTime, setStartTime] = useState(null); // store as milliseconds
+  const [startTime, setStartTime] = useState(null); // Date object in milliseconds
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -26,16 +25,6 @@ const CheckInOutToggle = () => {
     }
   };
 
-  // ✅ REPLACE parseCheckInTimeToLocalDate with IST-aware version
-  const parseCheckInTimeToLocalDate = (checkInTime) => {
-    const todayIST = moment.tz(
-      `${moment().format("YYYY-MM-DD")} ${checkInTime}`,
-      "YYYY-MM-DD HH:mm",
-      "Asia/Kolkata"
-    );
-    return todayIST.toDate();
-  };
-
   const toggleStatus = async () => {
     try {
       const res = await customFetch.post(
@@ -47,8 +36,7 @@ const CheckInOutToggle = () => {
 
       if (attendance.status === "Active") {
         setIsCheckedIn(true);
-        const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
-        setStartTime(start.getTime()); // store as milliseconds since epoch
+        setStartTime(new Date(attendance.checkInTime).getTime());
       } else {
         setIsCheckedIn(false);
         setStartTime(null);
@@ -56,7 +44,7 @@ const CheckInOutToggle = () => {
       }
     } catch (err) {
       toast.error(
-        "You can check out only once. Only one login will exist for one."
+        "You can check out only once per day. Only one login exists per day."
       );
     }
   };
@@ -68,13 +56,12 @@ const CheckInOutToggle = () => {
       });
       const attendance = res.data.attendance;
 
-      if (attendance?.status === "Active") {
+      if (attendance?.status === "Active" && attendance?.checkInTime) {
         setIsCheckedIn(true);
-        const start = parseCheckInTimeToLocalDate(attendance.checkInTime);
-        setStartTime(start.getTime());
+        setStartTime(new Date(attendance.checkInTime).getTime());
       }
     } catch (err) {
-      console.error("Could not fetch attendance", err);
+      console.error("❌ Could not fetch attendance", err);
     }
   };
 
@@ -124,7 +111,7 @@ const CheckInOutToggle = () => {
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={toggleStatus}
-        message="You can check out only once. Only one login will exist for one."
+        message="You can check out only once. Only one login will exist for the day."
       />
     </div>
   );
