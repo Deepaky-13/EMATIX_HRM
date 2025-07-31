@@ -126,7 +126,7 @@ const DashboardAdminaage = () => {
       {/* 1. Header */}
       <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between h-auto md:h-[70px]">
         <h1 className="text-2xl md:text-3xl font-bold tracking-wide mb-2 md:mb-0">
-          🚀 Welcome to Admin Dashboard
+          🚀 Admin Dashboard
         </h1>
         <p className="text-sm md:text-base font-medium text-gray-200">
           {currentDateTime}

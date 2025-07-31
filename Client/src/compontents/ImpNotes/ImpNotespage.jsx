@@ -14,9 +14,7 @@ const ImpNotesPage = () => {
   const fetchNotes = async () => {
     try {
       const res = await customFetch.get("/note"); // adjust URL to your backend
-      console.log(res);
-
-      setNotes(res.data ?? []); //
+      setNotes(res.data ?? []);
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch notes");
@@ -59,73 +57,81 @@ const ImpNotesPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Important Notes</h2>
+    <div className="max-w-7xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6 text-center md:text-left">
+        Important Notes
+      </h2>
 
       {/* Form */}
       <form
-        className="bg-white p-4 rounded shadow mb-6"
+        className="bg-white p-4 rounded shadow mb-8 max-w-xl mx-auto md:mx-0"
         onSubmit={handleSubmit}
       >
-        <div className="mb-2">
-          <label className="block text-sm font-medium">Agenda</label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Agenda</label>
           <input
             type="text"
             name="agenda"
             value={form.agenda}
             onChange={(e) => setForm({ ...form, agenda: e.target.value })}
-            className="border w-full p-2 rounded"
+            className="border border-gray-300 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
-        <div className="mb-2">
-          <label className="block text-sm font-medium">Description</label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             name="description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="border w-full p-2 rounded"
+            className="border border-gray-300 w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
             required
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition-colors duration-200 w-full md:w-auto"
         >
           {editingId ? "Update Note" : "Add Note"}
         </button>
       </form>
 
       {/* Notes List */}
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.isArray(notes) && notes.length === 0 ? (
-          <p className="text-gray-500">No notes found.</p>
+          <p className="text-gray-500 col-span-full text-center">
+            No notes found.
+          </p>
         ) : (
           Array.isArray(notes) &&
           notes.map((note) => (
             <div
               key={note._id}
-              className="bg-white p-4 rounded shadow relative"
+              className="bg-white p-5 rounded shadow relative flex flex-col"
             >
-              <h3 className="text-lg font-bold">{note.agenda}</h3>
-              <p className="text-gray-700">{note.description}</p>
-              <p className="text-xs text-gray-400 mt-2">
+              <h3 className="text-lg font-bold mb-2 truncate">{note.agenda}</h3>
+              <p className="text-gray-700 flex-grow whitespace-pre-wrap">
+                {note.description}
+              </p>
+              <p className="text-xs text-gray-400 mt-4">
                 Created:{" "}
                 {note.createdAt
                   ? new Date(note.createdAt).toLocaleString()
                   : "N/A"}
               </p>
-              <div className="absolute top-2 right-2 flex gap-2">
+              <div className="absolute right-2 bottom-0 flex gap-3 text-sm">
                 <button
-                  className="text-yellow-600 hover:underline"
+                  className="text-yellow-600 hover:underline focus:outline-none focus:ring-1 focus:ring-yellow-600 rounded"
                   onClick={() => handleEdit(note)}
+                  aria-label={`Edit note ${note.agenda}`}
                 >
                   Edit
                 </button>
                 <button
-                  className="text-red-600 hover:underline"
+                  className="text-red-600 hover:underline focus:outline-none focus:ring-1 focus:ring-red-600 rounded"
                   onClick={() => handleDelete(note._id)}
+                  aria-label={`Delete note ${note.agenda}`}
                 >
                   Delete
                 </button>

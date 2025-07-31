@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import CheckInOutToggle from "../compontents/ProfileManagement/CheckInOutToggle";
 import customFetch from "../utils/customFetch";
 import { FiLogOut } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -52,138 +51,142 @@ const Sidebar = ({ isAdmin, setActiveComponent, isOpen, setIsOpen }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile overlay when sidebar is open */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
           onClick={() => setIsOpen(false)}
+          aria-label="Close sidebar overlay"
         />
       )}
 
-      {/* Sidebar content */}
-      <div
-        className={`relative top-0 left-0 z-50 text-white
-    transform transition-transform duration-300 ease-in-out
-    md:translate-x-0
-    p-4 flex flex-col
-    ${isOpen ? "translate-x-0" : "-translate-x-full"}
-    w-[200px] min-w-[200px] max-w-[200px]
-  `}
-        style={{ backgroundColor: "#0133b0" }}
+      {/* Sidebar container */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full z-50
+          bg-[#74088C] text-white  
+          w-56 min-w-[14rem] max-w-[14rem]
+          flex flex-col
+          p-4
+          transform transition-transform duration-300 ease-in-out
+          md:translate-x-0
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+          md:static md:translate-x-0
+          shadow-lg md:shadow-none
+        `}
+        aria-label="Sidebar navigation"
       >
-        <h2 className="text-xl font-bold mb-6">
+        <h2 className="text-xl font-bold mb-6 truncate">
           Welcome{userInfo?.name ? `, ${userInfo.name}` : ""}
         </h2>
 
-        <div className="space-y-2 flex-1">
+        {/* Scrollable menu */}
+        <nav className="flex-1 overflow-y-auto space-y-2">
           {isAdmin ? (
             <>
               <button
                 onClick={() => handleClick("dashboard-admin")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaTachometerAlt /> Dashboard
               </button>
               <button
                 onClick={() => handleClick("department")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaBuilding /> Department
               </button>
               <button
                 onClick={() => handleClick("create-task")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaTasks /> Create Task
               </button>
               <button
                 onClick={() => handleClick("task-analyze")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaChartLine /> Task Analyze
               </button>
               <button
                 onClick={() => handleClick("attendance-admin")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaUserCheck /> Attendance
               </button>
               <button
                 onClick={() => handleClick("leave-admin")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaCalendarAlt /> Leaves
               </button>
               <button
                 onClick={() => handleClick("career-admin")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaBriefcase /> Career
               </button>
               <button
                 onClick={() => handleClick("notes")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaStickyNote /> Updates & Notes
               </button>
             </>
           ) : (
             <>
-              {/* <div className="bg-gray-700 p-2 rounded">
-                <CheckInOutToggle />
-              </div> */}
               <button
                 onClick={() => handleClick("dashboard-user")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaTachometerAlt /> Dashboard
               </button>
               <button
                 onClick={() => handleClick("daily-task")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaTasks /> Daily Task
               </button>
               <button
                 onClick={() => handleClick("attendance")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaUserCheck /> Attendance
               </button>
               <button
                 onClick={() => handleClick("leaves")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaCalendarAlt /> Leave
               </button>
               <button
                 onClick={() => handleClick("carrier-ApplyFrom")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaBriefcase /> Apply Career
               </button>
               <button
                 onClick={() => handleClick("update-password")}
-                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded"
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaLock /> Update Password
               </button>
             </>
           )}
-        </div>
+        </nav>
 
         <button
           onClick={handleLogout}
-          className="absolute bottom-16 left-4 w-40 flex items-center gap-2 text-white hover:bg-gray-700 p-2 rounded transition duration-200"
+          className="w-full mt-6 flex items-center justify-center gap-2 text-white hover:bg-gray-700 p-2 rounded transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
         >
           <FiLogOut className="text-lg" />
           <span>Log out</span>
         </button>
 
-        <p className="absolute bottom-4 left-4 text-xs text-gray-400">
+        <p className="mt-auto text-center text-xs text-gray-400 pt-4">
           © 2025 Ematix Embedded & Software Solutions Inc.
         </p>
-      </div>
+      </aside>
     </>
   );
 };
