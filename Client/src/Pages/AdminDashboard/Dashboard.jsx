@@ -18,6 +18,8 @@ import ImpNotesPage from "../../compontents/ImpNotes/ImpNotespage";
 import DashboardAdmin from "../../compontents/CommingSoon/DashboradAdmin";
 import ScrollToTopButton from "../../compontents/common/ScrollToTopButton";
 import DashboardAdminaage from "../../compontents/CommingSoon/DashboardAdminaage";
+import MarketingDashboard from "../Marketing/MarketingDashboard";
+import AdminMarketingLogs from "../Marketing/AdminMarketingLogs";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -48,6 +50,8 @@ const Dashboard = () => {
           return <AdminApplication />;
         case "notes":
           return <ImpNotesPage />;
+        case "marketing":
+          return <AdminMarketingLogs />;
         default:
           return <div className="text-gray-500">Select a section</div>;
       }
@@ -65,6 +69,8 @@ const Dashboard = () => {
           return <LeaveModule />;
         case "carrier-ApplyFrom":
           return <UserCareerPage />;
+        case "marketing":
+          return <MarketingDashboard />;
         default:
           return <div className="text-gray-500">Select a section</div>;
       }

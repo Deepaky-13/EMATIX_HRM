@@ -25,10 +25,25 @@ import NoteRouter from "./router/ImpNoteRouter/ImpNoteRouter.js";
 import CarrierRouter from "./router/Carrier/CarrierRouter.js";
 import UserApplyRouter from "./router/Carrier/UserApplicationRouter.js";
 import LoginRouter from "./router/Authentication/AuthRouter.js";
+import marketingRoutes from "./router/Marketing/MarketingRoutes.js";
 
 app.use(express.static(path.resolve(__dirname, "Client/dist")));
 app.use(cookieParser());
 app.use(express.json());
+
+// app.use(
+//   cors({
+//     origin: [
+//       "capacitor://localhost", // For native Android/iOS with Capacitor
+//       "http://localhost", // For local development
+//       "http://localhost:5173", // If you're using Vite locally
+//       "https://ematix-hrm-002.onrender.com", // Your deployed frontend URL
+//     ],
+//     methods: ["GET", "POST", "PATCH", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true,
+//   })
+// );
 
 const port = process.env.PORT || 3000;
 
@@ -44,7 +59,7 @@ app.use("/api/v1/note", NoteRouter);
 app.use("/api/v1/carrier", CarrierRouter);
 app.use("/api/v1/userApply", UserApplyRouter);
 app.use("/api/v1/auth/login", LoginRouter);
-
+app.use("/api/v1/marketing", marketingRoutes);
 // Add this route temporarily for debugging
 
 // Catch-all GET route for SPA routing

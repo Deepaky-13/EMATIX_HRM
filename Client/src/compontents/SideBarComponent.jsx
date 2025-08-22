@@ -121,6 +121,12 @@ const Sidebar = ({ isAdmin, setActiveComponent, isOpen, setIsOpen }) => {
                 <FaCalendarAlt /> Leaves
               </button>
               <button
+                onClick={() => handleClick("marketing")}
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                <FaCalendarAlt /> Marketing
+              </button>
+              <button
                 onClick={() => handleClick("career-admin")}
                 className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
@@ -158,6 +164,12 @@ const Sidebar = ({ isAdmin, setActiveComponent, isOpen, setIsOpen }) => {
                 className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <FaCalendarAlt /> Leave
+              </button>
+              <button
+                onClick={() => handleClick("marketing")}
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                <FaCalendarAlt /> Marketing
               </button>
               <button
                 onClick={() => handleClick("carrier-ApplyFrom")}
