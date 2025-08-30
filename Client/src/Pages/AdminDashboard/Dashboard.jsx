@@ -20,6 +20,8 @@ import ScrollToTopButton from "../../compontents/common/ScrollToTopButton";
 import DashboardAdminaage from "../../compontents/CommingSoon/DashboardAdminaage";
 import MarketingDashboard from "../Marketing/MarketingDashboard";
 import AdminMarketingLogs from "../Marketing/AdminMarketingLogs";
+import BackupModal from "../Marketing/BackUpModal";
+import BackupManager from "../Marketing/Backup";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -52,6 +54,8 @@ const Dashboard = () => {
           return <ImpNotesPage />;
         case "marketing":
           return <AdminMarketingLogs />;
+        case "backup":
+          return <BackupManager />;
         default:
           return <div className="text-gray-500">Select a section</div>;
       }

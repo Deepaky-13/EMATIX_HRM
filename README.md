@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
-  Plus,
-  Edit3,
-  Users,
-  UserCheck,
-  Clock,
-  MapPin,
-  Route,
-  Calendar,
+Plus,
+Edit3,
+Users,
+UserCheck,
+Clock,
+MapPin,
+Route,
+Calendar,
 } from "lucide-react";
 import customFetch from "../../utils/customFetch";
 import MarketingForm from "../../compontents/Marketing/MarketingForm";
@@ -15,33 +15,33 @@ import LeadsModal from "../../compontents/Marketing/LeadsModal";
 import ClientsModal from "../../compontents/Marketing/ClientModal";
 
 const MarketingDashboard = () => {
-  const [logs, setLogs] = useState([]);
-  const [openForm, setOpenForm] = useState(false);
-  const [editData, setEditData] = useState(null);
-  const [openLeads, setOpenLeads] = useState(false);
-  const [openClients, setOpenClients] = useState(false);
-  const [selectedLog, setSelectedLog] = useState(null);
-  const [user, setUser] = useState("");
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 3;
+const [logs, setLogs] = useState([]);
+const [openForm, setOpenForm] = useState(false);
+const [editData, setEditData] = useState(null);
+const [openLeads, setOpenLeads] = useState(false);
+const [openClients, setOpenClients] = useState(false);
+const [selectedLog, setSelectedLog] = useState(null);
+const [user, setUser] = useState("");
+const [search, setSearch] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const logsPerPage = 3;
 
-  useEffect(() => {
-    const fetchOwnData = async () => {
-      try {
-        const res = await customFetch.get("/auth/login/user");
-        setUser(res.data.user.userId);
-        console.log(res.data.user.userId);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchOwnData();
-  }, []);
-  const fetchLogs = async () => {
-    try {
-      const res = await customFetch.get("/marketing");
-      console.log(res.data);
+useEffect(() => {
+const fetchOwnData = async () => {
+try {
+const res = await customFetch.get("/auth/login/user");
+setUser(res.data.user.userId);
+console.log(res.data.user.userId);
+} catch (err) {
+console.error(err);
+}
+};
+fetchOwnData();
+}, []);
+const fetchLogs = async () => {
+try {
+const res = await customFetch.get("/marketing");
+console.log(res.data);
 
       const filteredLogs = res.data.filter((log) => log.User?._id === user);
 
@@ -50,73 +50,74 @@ const MarketingDashboard = () => {
     } catch (err) {
       console.error(err);
     }
-  };
 
-  const filteredLogs = logs.filter((log) => {
-    const query = search.toLowerCase();
-    return (
-      log.names?.toLowerCase().includes(query) ||
-      log.siteDetails?.toLowerCase().includes(query) ||
-      log.meetings?.toLowerCase().includes(query) ||
-      log.date?.toString().toLowerCase().includes(query)
-    );
-  });
-  const indexOfLastLog = currentPage * logsPerPage;
-  const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+};
 
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+const filteredLogs = logs.filter((log) => {
+const query = search.toLowerCase();
+return (
+log.names?.toLowerCase().includes(query) ||
+log.siteDetails?.toLowerCase().includes(query) ||
+log.meetings?.toLowerCase().includes(query) ||
+log.date?.toString().toLowerCase().includes(query)
+);
+});
+const indexOfLastLog = currentPage \* logsPerPage;
+const indexOfFirstLog = indexOfLastLog - logsPerPage;
+const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
 
-  useEffect(() => {
-    if (user) {
-      fetchLogs();
-    }
-  }, [user]);
+const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
 
-  const handleEdit = (log) => {
-    setEditData(log);
-    setOpenForm(true);
-  };
+useEffect(() => {
+if (user) {
+fetchLogs();
+}
+}, [user]);
 
-  const handleLeads = (log) => {
-    setSelectedLog(log);
-    setOpenLeads(true);
-  };
+const handleEdit = (log) => {
+setEditData(log);
+setOpenForm(true);
+};
 
-  const handleClients = (log) => {
-    setSelectedLog(log);
-    setOpenClients(true);
-  };
+const handleLeads = (log) => {
+setSelectedLog(log);
+setOpenLeads(true);
+};
 
-  // Helper for 12-hour format
-  const formatTime = (time) => {
-    if (!time) return "-";
-    return new Date(`1970-01-01T${time}`).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-  };
-  console.log(logs);
+const handleClients = (log) => {
+setSelectedLog(log);
+setOpenClients(true);
+};
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg">
-              <Route className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Marketing Logs
-              </h1>
-              <p className="text-gray-600 text-sm">
-                Track your marketing activities and client interactions
-              </p>
-            </div>
-          </div>
+// Helper for 12-hour format
+const formatTime = (time) => {
+if (!time) return "-";
+return new Date(`1970-01-01T${time}`).toLocaleTimeString("en-US", {
+hour: "numeric",
+minute: "numeric",
+hour12: true,
+});
+};
+console.log(logs);
+
+return (
+<div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+<div className="max-w-7xl mx-auto">
+{/_ Header _/}
+<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+<div className="flex items-center gap-3">
+<div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg">
+<Route className="w-8 h-8 text-white" />
+</div>
+<div>
+<h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+Marketing Logs
+</h1>
+<p className="text-gray-600 text-sm">
+Track your marketing activities and client interactions
+</p>
+</div>
+</div>
 
           <button
             onClick={() => setOpenForm(true)}
@@ -466,7 +467,8 @@ const MarketingDashboard = () => {
         />
       )}
     </div>
-  );
+
+);
 };
 
 export default MarketingDashboard;

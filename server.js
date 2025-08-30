@@ -26,6 +26,7 @@ import CarrierRouter from "./router/Carrier/CarrierRouter.js";
 import UserApplyRouter from "./router/Carrier/UserApplicationRouter.js";
 import LoginRouter from "./router/Authentication/AuthRouter.js";
 import marketingRoutes from "./router/Marketing/MarketingRoutes.js";
+import BackupRouter from "./router/Backup/BackupRoute.js";
 
 app.use(express.static(path.resolve(__dirname, "Client/dist")));
 app.use(cookieParser());
@@ -60,6 +61,7 @@ app.use("/api/v1/carrier", CarrierRouter);
 app.use("/api/v1/userApply", UserApplyRouter);
 app.use("/api/v1/auth/login", LoginRouter);
 app.use("/api/v1/marketing", marketingRoutes);
+app.use("/api/v1/backup", BackupRouter);
 // Add this route temporarily for debugging
 
 // Catch-all GET route for SPA routing
