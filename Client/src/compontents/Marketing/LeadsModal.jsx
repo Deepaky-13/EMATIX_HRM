@@ -352,13 +352,13 @@ const LeadsModal = ({ open, handleClose, log }) => {
                         Contact: {lead.leadContactNumber}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Added by: {lead.User?.name || "Unknown"}
+                        {/* Added by: {lead.User?.name || "Unknown"} */}
                       </p>
 
                       {/* Show lead photo */}
-                      {lead.image && (
+                      {lead.images && (
                         <img
-                          src={lead.image}
+                          src={lead.images}
                           alt="lead"
                           className="mt-2 w-24 h-24 rounded-lg object-cover border"
                         />

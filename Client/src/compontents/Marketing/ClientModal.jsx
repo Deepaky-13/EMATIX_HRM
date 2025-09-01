@@ -401,9 +401,9 @@ const ClientsModal = ({ open, handleClose, log }) => {
 
                       {/* Show client photo */}
                       {/* Show uploaded image from backend */}
-                      {client.image && (
+                      {client.images && (
                         <img
-                          src={client.image}
+                          src={client.images}
                           alt="client"
                           className="mt-2 w-24 h-24 rounded-lg object-cover border"
                         />

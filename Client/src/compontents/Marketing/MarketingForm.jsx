@@ -534,10 +534,14 @@ const MarketingForm = ({ open, handleClose, editData }) => {
         ? await customFetch.put(`/marketing/${editData._id}`, payload)
         : await customFetch.post("/marketing", payload);
 
-      if (response.ok || response.status === 201) {
+      if (response.ok || response.status === 201 || response.status === 200) {
         handleClose();
+        toast.success(
+          `Marketing log ${editData ? "updated" : "created"} successfully!`
+        );
       } else {
         console.error("Failed to submit form");
+        toast.error("Failed to submit form. Please try again.");
       }
     } catch (err) {
       console.error("Error submitting form:", err);

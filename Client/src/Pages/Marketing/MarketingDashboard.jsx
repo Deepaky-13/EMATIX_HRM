@@ -24,6 +24,7 @@ const MarketingDashboard = () => {
   const [user, setUser] = useState("");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterMode, setFilterMode] = useState("today");
   const logsPerPage = 3;
 
   useEffect(() => {
@@ -52,15 +53,26 @@ const MarketingDashboard = () => {
     }
   };
 
-  const filteredLogs = logs.filter((log) => {
-    const query = search.toLowerCase();
-    return (
-      log.names?.toLowerCase().includes(query) ||
-      log.siteDetails?.toLowerCase().includes(query) ||
-      log.meetings?.toLowerCase().includes(query) ||
-      log.date?.toString().toLowerCase().includes(query)
-    );
-  });
+  // ✅ Filtering logic
+  const today = new Date().toISOString().split("T")[0]; // format YYYY-MM-DD
+  const filteredLogs = logs
+    .filter((log) => {
+      // apply Today filter
+      if (filterMode === "today") {
+        return new Date(log.date).toISOString().split("T")[0] === today;
+      }
+      return true;
+    })
+    .filter((log) => {
+      const query = search.toLowerCase();
+      return (
+        log.names?.toLowerCase().includes(query) ||
+        log.siteDetails?.toLowerCase().includes(query) ||
+        log.meetings?.toLowerCase().includes(query) ||
+        log.date?.toString().toLowerCase().includes(query)
+      );
+    });
+
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
   const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
@@ -126,7 +138,7 @@ const MarketingDashboard = () => {
             Add New Log
           </button>
         </div>
-        {/* Search Input */}
+        {/* Search Input & Toggle */}
         <div className="flex justify-between items-center mb-6">
           <input
             type="text"
@@ -138,59 +150,38 @@ const MarketingDashboard = () => {
             }}
             className="px-4 py-2 border rounded-xl w-1/3 focus:ring focus:ring-indigo-200"
           />
+
+          {/* Toggle Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setFilterMode("today");
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                filterMode === "today"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => {
+                setFilterMode("all");
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                filterMode === "all"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              All
+            </button>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Calendar className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {logs.length}
-                </p>
-                <p className="text-gray-600 text-sm">Total Logs</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-100 rounded-xl">
-                <Users className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {
-                    logs.filter((log) => log.meetings && log.meetings !== "N/A")
-                      .length
-                  }
-                </p>
-                <p className="text-gray-600 text-sm">Active Meetings</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow duration-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-xl">
-                <MapPin className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {
-                    logs.filter(
-                      (log) => log.siteDetails && log.siteDetails !== "N/A"
-                    ).length
-                  }
-                </p>
-                <p className="text-gray-600 text-sm">Site Visits</p>
-              </div>
-            </div>
-          </div>
-        </div> */}
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Total Logs */}
