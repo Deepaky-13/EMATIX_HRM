@@ -4,10 +4,11 @@ import path from "path";
 import { downloadAndZipImages } from "../../utils/ZipUtils.js";
 // Create a new marketing log
 export const createLog = async (req, res, next) => {
+  console.log("Creating marketing log with data:", req.body);
   try {
     const log = await MarketingLog.create({
       ...req.body,
-      User: req.user.userId, // attach logged-in user
+      User: req.user.userId,
     });
     res.status(201).json(log);
   } catch (err) {

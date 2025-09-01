@@ -1,4 +1,4 @@
-// import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, use } from "react";
 // import {
 //   Calendar,
 //   Clock,
@@ -10,20 +10,43 @@
 //   X,
 //   Loader2,
 // } from "lucide-react";
-// import customFetch from "../../utils/customFetch"; // ✅ use customFetch
+// import customFetch from "../../utils/customFetch";
+// import { toast } from "react-toastify";
 
 // const MarketingForm = ({ open, handleClose, editData }) => {
+//   const [currentUser, setCurrentUser] = useState("");
+
+//   //*---get the current user-------
+//   useEffect(() => {
+//     const fetchUser = async () => {
+//       try {
+//         const response = await customFetch.get("auth/login/user");
+
+//         console.log("user", response.data.user.name);
+
+//         setCurrentUser(response.data.user.name);
+//       } catch (err) {
+//         console.error("Error fetching user data:", err);
+//       }
+//     };
+//     fetchUser();
+//   }, []);
+
 //   const [form, setForm] = useState({
 //     date: "",
 //     intime: "",
 //     meetings: "",
-//     names: "",
+//     names: currentUser || "",
 //     startKM: "",
 //     officeOutTime: "",
+//     officeOutLocation: null,
 //     siteReachedTime: "",
+//     siteReachedLocation: null,
 //     siteDetails: "",
 //     siteOutTime: "",
+//     siteOutLocation: null,
 //     officeReachedTime: "",
+//     officeReachedLocation: null,
 //     endingKM: "",
 //     verifyAuthority: "",
 //   });
@@ -36,13 +59,17 @@
 //         date: editData.date ? editData.date.split("T")[0] : "",
 //         intime: editData.intime || "",
 //         meetings: editData.meetings || "",
-//         names: editData.names || "",
+//         names: editData.names || currentUser || "",
 //         startKM: editData.startKM || "",
 //         officeOutTime: editData.officeOutTime || "",
+//         officeOutLocation: editData.officeOutLocation || null,
 //         siteReachedTime: editData.siteReachedTime || "",
+//         siteReachedLocation: editData.siteReachedLocation || null,
 //         siteDetails: editData.siteDetails || "",
 //         siteOutTime: editData.siteOutTime || "",
+//         siteOutLocation: editData.siteOutLocation || null,
 //         officeReachedTime: editData.officeReachedTime || "",
+//         officeReachedLocation: editData.officeReachedLocation || null,
 //         endingKM: editData.endingKM || "",
 //         verifyAuthority: editData.verifyAuthority || "",
 //       });
@@ -51,13 +78,17 @@
 //         date: "",
 //         intime: "",
 //         meetings: "",
-//         names: "",
+//         names: currentUser || "",
 //         startKM: "",
 //         officeOutTime: "",
+//         officeOutLocation: null,
 //         siteReachedTime: "",
+//         siteReachedLocation: null,
 //         siteDetails: "",
 //         siteOutTime: "",
+//         siteOutLocation: null,
 //         officeReachedTime: "",
+//         officeReachedLocation: null,
 //         endingKM: "",
 //         verifyAuthority: "",
 //       });
@@ -67,12 +98,57 @@
 //   const handleChange = (e) =>
 //     setForm({ ...form, [e.target.name]: e.target.value });
 
+//   const captureLocation = (field) => {
+//     if (!navigator.geolocation) {
+//       console.error("Geolocation not supported");
+//       return;
+//     }
+
+//     navigator.geolocation.getCurrentPosition(
+//       (pos) => {
+//         const { latitude, longitude } = pos.coords;
+
+//         let locationField = "";
+//         switch (field) {
+//           case "officeOutTime":
+//             locationField = "officeOutLocation";
+//             break;
+//           case "siteReachedTime":
+//             locationField = "siteReachedLocation";
+//             break;
+//           case "siteOutTime":
+//             locationField = "siteOutLocation";
+//             break;
+//           case "officeReachedTime":
+//             locationField = "officeReachedLocation";
+//             break;
+//           default:
+//             return;
+//         }
+
+//         // ✅ Save only lat/lng (matches schema)
+//         setForm((prev) => ({
+//           ...prev,
+//           [locationField]: {
+//             lat: latitude,
+//             lng: longitude,
+//           },
+//         }));
+//       },
+//       (err) => {
+//         console.warn("⚠️ Location not captured:", err.message);
+//       },
+//       { enableHighAccuracy: true, timeout: 10000 }
+//     );
+//   };
+
 //   const handleSubmit = async () => {
 //     setIsSubmitting(true);
 //     try {
+//       const payload = { ...form, names: currentUser };
 //       const response = editData
-//         ? await customFetch.put(`/marketing/${editData._id}`, form)
-//         : await customFetch.post("/marketing", form);
+//         ? await customFetch.put(`/marketing/${editData._id}`, payload)
+//         : await customFetch.post("/marketing", payload);
 
 //       if (response.ok || response.status === 201) {
 //         handleClose();
@@ -83,25 +159,6 @@
 //       console.error("Error submitting form:", err);
 //     } finally {
 //       setIsSubmitting(false);
-//     }
-//   };
-
-//   const captureLocation = async (field) => {
-//     if (navigator.geolocation) {
-//       navigator.geolocation.getCurrentPosition(
-//         (pos) => {
-//           const { latitude, longitude } = pos.coords;
-//           setForm((prev) => ({
-//             ...prev,
-//             [`${field}Location`]: { lat: latitude, lng: longitude },
-//           }));
-//         },
-//         (err) => {
-//           console.error("Location access denied:", err);
-//         }
-//       );
-//     } else {
-//       console.error("Geolocation not supported");
 //     }
 //   };
 
@@ -152,7 +209,7 @@
 //   const fieldSections = [
 //     {
 //       title: "Basic Information",
-//       fields: ["date", "intime", "names"],
+//       fields: ["date", "intime"],
 //       bgColor: "bg-blue-50",
 //       titleColor: "text-blue-700",
 //       borderColor: "border-blue-200",
@@ -187,38 +244,33 @@
 
 //   return (
 //     <div className="fixed inset-0 z-50 overflow-y-auto">
-//       {/* Backdrop */}
 //       <div
 //         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
 //         onClick={handleClose}
 //       />
-
-//       {/* Modal */}
 //       <div className="flex min-h-full items-center justify-center p-2 sm:p-6">
 //         <div className="relative w-full max-w-7xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300">
 //           {/* Header */}
-//           <div className="border-b border-gray-200 px-4 sm:px-10 py-6 sm:py-8">
-//             <div className="flex items-center justify-between">
-//               <div className="space-y-3">
-//                 <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//                   {editData ? "Edit Marketing Log" : "Add Marketing Log"}
-//                 </h2>
-//                 <p className="text-sm sm:text-lg text-gray-600 max-w-2xl">
-//                   {editData
-//                     ? "Update the marketing activity details below with accurate information."
-//                     : "Fill in the comprehensive details for your marketing activity and site visits."}
-//                 </p>
-//               </div>
-//               <button
-//                 onClick={handleClose}
-//                 className="rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-colors duration-200 group"
-//               >
-//                 <X
-//                   size={24}
-//                   className="text-gray-400 group-hover:text-gray-600"
-//                 />
-//               </button>
+//           <div className="border-b border-gray-200 px-4 sm:px-10 py-6 sm:py-8 flex justify-between items-center">
+//             <div className="space-y-3">
+//               <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+//                 {editData ? "Edit Marketing Log" : "Add Marketing Log"}
+//               </h2>
+//               <p className="text-sm sm:text-lg text-gray-600 max-w-2xl">
+//                 {editData
+//                   ? "Update marketing activity details below."
+//                   : "Fill in the comprehensive details for your marketing activity and site visits."}
+//               </p>
 //             </div>
+//             <button
+//               onClick={handleClose}
+//               className="rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-colors duration-200 group"
+//             >
+//               <X
+//                 size={24}
+//                 className="text-gray-400 group-hover:text-gray-600"
+//               />
+//             </button>
 //           </div>
 
 //           {/* Content */}
@@ -253,7 +305,7 @@
 //                         </label>
 //                         <div className="relative">
 //                           <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-start pt-3 sm:pt-4">
-//                             {getFieldIcon(key)}
+//                             {/* {getFieldIcon(key)} */}
 //                           </div>
 //                           {key === "siteDetails" || key === "meetings" ? (
 //                             <textarea
@@ -262,12 +314,7 @@
 //                               value={form[key]}
 //                               onChange={handleChange}
 //                               rows={4}
-//                               className={`block w-full rounded-xl border-2 border-gray-300 pl-10 sm:pl-12 pr-4 py-3 sm:py-4 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base ${
-//                                 key === "verifyAuthority"
-//                                   ? "bg-gray-50 cursor-not-allowed"
-//                                   : "bg-white hover:border-gray-400"
-//                               }`}
-//                               disabled={key === "verifyAuthority"}
+//                               className="block w-full rounded-xl border-2 border-gray-300 pl-10 sm:pl-12 pr-4 py-3 sm:py-4 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base bg-white hover:border-gray-400"
 //                               placeholder={`Enter ${getFieldLabel(
 //                                 key
 //                               ).toLowerCase()}...`}
@@ -279,25 +326,14 @@
 //                                   ? "number"
 //                                   : key === "date"
 //                                   ? "date"
-//                                   : key.includes("Time") || key === "intime"
-//                                   ? "time"
-//                                   : "text"
+//                                   : "time"
 //                               }
 //                               id={key}
 //                               name={key}
 //                               value={form[key]}
 //                               onChange={(e) => {
 //                                 handleChange(e);
-//                                 if (
-//                                   [
-//                                     "officeOutTime",
-//                                     "siteReachedTime",
-//                                     "siteOutTime",
-//                                     "officeReachedTime",
-//                                   ].includes(key)
-//                                 ) {
-//                                   captureLocation(key);
-//                                 }
+//                                 captureLocation(key); // capture location for time fields
 //                               }}
 //                             />
 //                           )}
@@ -360,13 +396,32 @@ import {
   Loader2,
 } from "lucide-react";
 import customFetch from "../../utils/customFetch";
-
+import { toast } from "react-toastify";
 const MarketingForm = ({ open, handleClose, editData }) => {
+  const [currentUser, setCurrentUser] = useState("");
+
+  //*---get the current user-------
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await customFetch.get("auth/login/user");
+
+        console.log("user", response.data.user.name);
+
+        setCurrentUser(response.data.user.name);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const today = new Date().toISOString().split("T")[0]; // ✅ today's date
+
   const [form, setForm] = useState({
-    date: "",
+    date: today,
     intime: "",
     meetings: "",
-    names: "",
     startKM: "",
     officeOutTime: "",
     officeOutLocation: null,
@@ -382,14 +437,14 @@ const MarketingForm = ({ open, handleClose, editData }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationError, setLocationError] = useState(false); // ✅ track location error
 
   useEffect(() => {
     if (editData) {
       setForm({
-        date: editData.date ? editData.date.split("T")[0] : "",
+        date: editData.date ? editData.date.split("T")[0] : today,
         intime: editData.intime || "",
         meetings: editData.meetings || "",
-        names: editData.names || "",
         startKM: editData.startKM || "",
         officeOutTime: editData.officeOutTime || "",
         officeOutLocation: editData.officeOutLocation || null,
@@ -404,34 +459,17 @@ const MarketingForm = ({ open, handleClose, editData }) => {
         verifyAuthority: editData.verifyAuthority || "",
       });
     } else {
-      setForm({
-        date: "",
-        intime: "",
-        meetings: "",
-        names: "",
-        startKM: "",
-        officeOutTime: "",
-        officeOutLocation: null,
-        siteReachedTime: "",
-        siteReachedLocation: null,
-        siteDetails: "",
-        siteOutTime: "",
-        siteOutLocation: null,
-        officeReachedTime: "",
-        officeReachedLocation: null,
-        endingKM: "",
-        verifyAuthority: "",
-      });
+      setForm((prev) => ({ ...prev, date: today }));
     }
-  }, [editData, open]);
+  }, [editData, open, today]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // Only capture location if the user clicks the button
   const captureLocation = (field) => {
     if (!navigator.geolocation) {
       console.error("Geolocation not supported");
+      setLocationError(true);
       return;
     }
 
@@ -440,6 +478,9 @@ const MarketingForm = ({ open, handleClose, editData }) => {
         const { latitude, longitude } = pos.coords;
         let locationField = "";
         switch (field) {
+          case "intime":
+            locationField = "intimeLocation";
+            break;
           case "officeOutTime":
             locationField = "officeOutLocation";
             break;
@@ -459,20 +500,39 @@ const MarketingForm = ({ open, handleClose, editData }) => {
           ...prev,
           [locationField]: { lat: latitude, lng: longitude },
         }));
+        setLocationError(false); // ✅ location captured successfully
       },
       (err) => {
         console.warn("Location not captured:", err.message);
-        // optional: show toast to user
+        setLocationError(true); // ✅ mark error if denied or failed
       }
     );
   };
 
   const handleSubmit = async () => {
+    // ✅ block submission if location not available
+    if (
+      !form.intimeLocation &&
+      !form.officeOutLocation &&
+      !form.siteReachedLocation &&
+      !form.siteOutLocation &&
+      !form.officeReachedLocation
+    ) {
+      toast.info("Please Enable Location");
+      return;
+    }
+
+    if (locationError) {
+      toast.info("Location permission is required to submit the form.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      const payload = { ...form, names: currentUser };
       const response = editData
-        ? await customFetch.put(`/marketing/${editData._id}`, form)
-        : await customFetch.post("/marketing", form);
+        ? await customFetch.put(`/marketing/${editData._id}`, payload)
+        : await customFetch.post("/marketing", payload);
 
       if (response.ok || response.status === 201) {
         handleClose();
@@ -498,7 +558,6 @@ const MarketingForm = ({ open, handleClose, editData }) => {
       case "officeReachedTime":
         return <Clock {...iconProps} className="text-green-500" />;
       case "meetings":
-      case "names":
         return <Users {...iconProps} className="text-purple-500" />;
       case "startKM":
       case "endingKM":
@@ -517,7 +576,6 @@ const MarketingForm = ({ open, handleClose, editData }) => {
       date: "Date",
       intime: "In Time",
       meetings: "Meetings",
-      names: "Names",
       startKM: "Starting KM",
       officeOutTime: "Office Out Time",
       siteReachedTime: "Site Reached Time",
@@ -533,7 +591,7 @@ const MarketingForm = ({ open, handleClose, editData }) => {
   const fieldSections = [
     {
       title: "Basic Information",
-      fields: ["date", "intime", "names"],
+      fields: ["date", "intime"], // ✅ removed "names"
       bgColor: "bg-blue-50",
       titleColor: "text-blue-700",
       borderColor: "border-blue-200",
@@ -586,6 +644,7 @@ const MarketingForm = ({ open, handleClose, editData }) => {
                   : "Fill in the comprehensive details for your marketing activity and site visits."}
               </p>
             </div>
+
             <button
               onClick={handleClose}
               className="rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-colors duration-200 group"
@@ -657,8 +716,16 @@ const MarketingForm = ({ open, handleClose, editData }) => {
                               value={form[key]}
                               onChange={(e) => {
                                 handleChange(e);
-                                captureLocation(key); // capture location for time fields
+                                if (key !== "date" && !key.includes("KM")) {
+                                  captureLocation(key); // ✅ ask location on time input
+                                }
                               }}
+                              disabled={key === "date"} // ✅ date can't be clicked
+                              className={`block w-full rounded-xl border-2 border-gray-300 pl-10 sm:pl-12 pr-4 py-3 sm:py-4 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base bg-white ${
+                                key === "date"
+                                  ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                  : "hover:border-gray-400"
+                              }`}
                             />
                           )}
                         </div>

@@ -45,25 +45,108 @@ const AdminMarketingLog = () => {
   const [leadDialogOpen, setLeadDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // useEffect(() => {
+  //   const fetchLogs = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const { data } = await customFetch.get("/marketing");
+  //       console.log(data, " : fetched marketing logs");
+
+  //       await new Promise((resolve) => setTimeout(resolve, 1000));
+  //       setLogs(data);
+  //     } catch (err) {
+  //       console.error("Error fetching logs:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchLogs();
+  // }, []);
+
+  // Format time display
+
+  const getLocationFromCoords = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
+      );
+      const data = await res.json();
+      return data.display_name || `${lat}, ${lon}`;
+    } catch (err) {
+      console.error("Reverse geocoding failed:", err);
+      return `${lat}, ${lon}`;
+    }
+  };
+
+  const formatTimeIST = (utcDate) => {
+    if (!utcDate) return "-";
+    return new Date(utcDate).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         setLoading(true);
         const { data } = await customFetch.get("/marketing");
-        console.log(data, " : fetched marketing logs");
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setLogs(data);
+        const logsWithAddress = await Promise.all(
+          data.map(async (log) => {
+            // Office Out Location
+            if (log.officeOutLocation?.lat && log.officeOutLocation?.lng) {
+              log.officeOutLocation.locationName = await getLocationFromCoords(
+                log.officeOutLocation.lat,
+                log.officeOutLocation.lng
+              );
+            }
+            // Site Reached Location
+            if (log.siteReachedLocation?.lat && log.siteReachedLocation?.lng) {
+              log.siteReachedLocation.locationName =
+                await getLocationFromCoords(
+                  log.siteReachedLocation.lat,
+                  log.siteReachedLocation.lng
+                );
+            }
+            // Site Out Location
+            if (log.siteOutLocation?.lat && log.siteOutLocation?.lng) {
+              log.siteOutLocation.locationName = await getLocationFromCoords(
+                log.siteOutLocation.lat,
+                log.siteOutLocation.lng
+              );
+            }
+            // Office Reached Location
+            if (
+              log.officeReachedLocation?.lat &&
+              log.officeReachedLocation?.lng
+            ) {
+              log.officeReachedLocation.locationName =
+                await getLocationFromCoords(
+                  log.officeReachedLocation.lat,
+                  log.officeReachedLocation.lng
+                );
+            }
+
+            return log;
+          })
+        );
+        logsWithAddress.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setLogs(logsWithAddress);
       } catch (err) {
         console.error("Error fetching logs:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchLogs();
   }, []);
 
-  // Format time display
   const formatTime = (time) => {
     if (!time) return "-";
     return time;
@@ -587,41 +670,62 @@ const AdminMarketingLog = () => {
                   </TableCell>
                   <TableCell sx={{ minWidth: 160, width: 160, maxWidth: 160 }}>
                     <Box>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        gap={0.5}
-                        mb={0.5}
-                      >
-                        <LocationOn sx={{ fontSize: 20, color: "#666" }} />
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            maxWidth: 120,
-                          }}
-                          title={log.siteDetails}
-                        >
-                          {log.siteDetails || "-"}
-                        </Typography>
-                      </Box>
                       <Typography variant="caption" display="block">
-                        Reached: {formatTime(log.siteReachedTime)}
+                        Out: {formatTimeIST(log.officeOutLocation?.capturedAt)}
                       </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                      >
+                        {" "}
+                        {log.officeOutLocation?.locationName ||
+                          `${log.officeOutLocation?.lat}, ${log.officeOutLocation?.lng}`}
+                      </Typography>
+
                       <Typography variant="caption" display="block">
-                        Left: {formatTime(log.siteOutTime)}
+                        Back:{" "}
+                        {formatTimeIST(log.officeReachedLocation?.capturedAt)}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                      >
+                        {" "}
+                        {log.officeReachedLocation?.locationName ||
+                          `${log.officeReachedLocation?.lat}, ${log.officeReachedLocation?.lng}`}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ minWidth: 120, width: 120, maxWidth: 120 }}>
+
+                  <TableCell sx={{ minWidth: 160, width: 160, maxWidth: 160 }}>
                     <Box>
                       <Typography variant="caption" display="block">
-                        Out: {formatTime(log.officeOutTime)}
+                        Reached:{" "}
+                        {formatTimeIST(log.siteReachedLocation?.capturedAt)}
                       </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                      >
+                        {" "}
+                        {log.siteReachedLocation?.locationName ||
+                          `${log.siteReachedLocation?.lat}, ${log.siteReachedLocation?.lng}`}
+                      </Typography>
+
                       <Typography variant="caption" display="block">
-                        Back: {formatTime(log.officeReachedTime)}
+                        Left: {formatTimeIST(log.siteOutLocation?.capturedAt)}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                      >
+                        {" "}
+                        {log.siteOutLocation?.locationName ||
+                          `${log.siteOutLocation?.lat}, ${log.siteOutLocation?.lng}`}
                       </Typography>
                     </Box>
                   </TableCell>
